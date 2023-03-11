@@ -1,6 +1,6 @@
 #include<bits/stdc++.h>
 using namespace std;
-bool isValidExpression(string expression, vector<string>& minterms, vector<string>& variables){
+bool isValidExpression(string expression, vector<string>& terms, vector<string>& variables){
     string current_minterm; 
     for(int i =0; i<expression.length(); i++){
         if(expression[i]!='\'' && expression[i]!='+' && !isalpha(expression[i])){
@@ -13,8 +13,8 @@ bool isValidExpression(string expression, vector<string>& minterms, vector<strin
                 variables.push_back(temp_variable); 
             } 
             current_minterm +=temp_variable; 
-            if(find(minterms.begin(), minterms.end(), current_minterm)==minterms.end()){
-                minterms.push_back(current_minterm);
+            if(find(terms.begin(), terms.end(), current_minterm)==terms.end()){
+                terms.push_back(current_minterm);
             } 
         }else if(isalpha(expression[i]) && expression[i+1]=='+'){
             string temp_variable = "";
@@ -23,17 +23,17 @@ bool isValidExpression(string expression, vector<string>& minterms, vector<strin
                 variables.push_back(temp_variable); 
             } 
             current_minterm +=temp_variable; 
-            if(find(minterms.begin(), minterms.end(), current_minterm)==minterms.end()){
-                minterms.push_back(current_minterm);
+            if(find(terms.begin(), terms.end(), current_minterm)==terms.end()){
+                terms.push_back(current_minterm);
             } 
         }
-        else if(expression[i]=='+' && minterms.size()==0){
+        else if(expression[i]=='+' && terms.size()==0){
             return false;
         }else if(expression[i] == '\'' && (i == 0||!isalpha(expression[i-1]))){
             return false;
-        }else if(expression[i]=='+' && minterms.size()!=0){
-            if(find(minterms.begin(), minterms.end(), current_minterm)==minterms.end()){
-                minterms.push_back(current_minterm);
+        }else if(expression[i]=='+' && terms.size()!=0){
+            if(find(terms.begin(), terms.end(), current_minterm)==terms.end()){
+                terms.push_back(current_minterm);
             } 
             current_minterm = ""; 
         }else if(isalpha(expression[i]) && expression[i+1]=='\''){
@@ -44,8 +44,8 @@ bool isValidExpression(string expression, vector<string>& minterms, vector<strin
             }
             temp_variable += expression[i+1];
             current_minterm +=temp_variable; 
-            if(find(minterms.begin(), minterms.end(), current_minterm)==minterms.end() && i==expression.length()-2){
-                minterms.push_back(current_minterm);
+            if(find(terms.begin(), terms.end(), current_minterm)==terms.end() && i==expression.length()-2){
+                terms.push_back(current_minterm);
             } 
             i++;  
         }else{
@@ -60,7 +60,7 @@ bool isValidExpression(string expression, vector<string>& minterms, vector<strin
     return true; 
 }
 
-void printTruthTable(const vector<string>& minterms, vector<string>& variables) {
+void printTruthTable(const vector<string>& terms, vector<string> variables,vector<string>& binary_minterms, vector<int>& decimal_minterms) {
     int n = variables.size();
     int numRows = pow(2, n);
     sort(variables.begin(), variables.end());
@@ -76,19 +76,28 @@ void printTruthTable(const vector<string>& minterms, vector<string>& variables) 
     string SoP = ""; 
     for (int i = 0; i < numRows; i++) {
         vector<bool> inputs;
-        for (int j = 0; j < n; j++) {
+        string temp_binary_minterm = "";
+        for (int j = 0; j <n; j++){
             inputs.push_back((i >> j) & 1);
+        }
+        reverse(inputs.begin(), inputs.end());
+        for(int j=0; j<n; j++){
             cout << inputs[j] << "\t";
+            if(inputs[j]){
+                temp_binary_minterm += "1"; 
+            }else{
+                temp_binary_minterm += "0"; 
+            }
         }
         bool output = false;
-        for (int j = 0; j < minterms.size(); j++) {
+        for (int j = 0; j < terms.size(); j++) {
 
             bool value = true;
-            for(int z=0; z<minterms[j].size();z++){
+            for(int z=0; z<terms[j].size();z++){
                 for (int k = 0; k < n; k++) {
-                    if (minterms[j][z] == variables[k][0] && minterms[j][z+1]!='\'') {
+                    if (terms[j][z] == variables[k][0] && terms[j][z+1]!='\'') {
                         value &= inputs[k];
-                    } else if (minterms[j][z] == (variables[k][0]) && minterms[j][z+1]=='\'') {
+                    } else if (terms[j][z] == (variables[k][0]) && terms[j][z+1]=='\'') {
                         value &= !inputs[k];
                         z++; 
                     }
@@ -109,6 +118,8 @@ void printTruthTable(const vector<string>& minterms, vector<string>& variables) 
         }
         if(output){
             SoP += (temp_minterm + "+");
+            binary_minterms.push_back(temp_binary_minterm);
+            decimal_minterms.push_back(i);
         }else{
             PoS += (temp_maxterm);
             PoS[PoS.length()-1]=')';
@@ -122,11 +133,13 @@ void printTruthTable(const vector<string>& minterms, vector<string>& variables) 
 }
 
 int main(){
-    vector<string> minterms; 
+    vector<string> terms; 
     vector<string> variables;
+    vector<string> binary_minterms;
+    vector<int> decimal_minterms;
     string expression; 
     cin >> expression; 
-    isValidExpression(expression,minterms,variables);
-    printTruthTable(minterms,variables);
+    isValidExpression(expression,terms,variables);
+    printTruthTable(terms,variables,binary_minterms,decimal_minterms);
     return 0; 
 }
