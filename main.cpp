@@ -145,36 +145,37 @@ set<set<int>> vectorToSet(vector<int>& vec) {
 }
 
 //detect the number of variables in boolean function
-int num_of_variables(vector<int> minterms) {
-    int max = 0;
-    for (int i = 0; i < minterms.size(); i++) {
-        if (minterms[i] > max) {
-            max = minterms[i];
-        }
-    }
-    int num_of_bits = 0;
-    while (max > 0) {
-        max = max / 2;
-        num_of_bits++;
-    }
-    return num_of_bits;
-}
+// int num_of_variables(vector<int> minterms) {
+//     int max = 0;
+//     for (int i = 0; i < minterms.size(); i++) {
+//         if (minterms[i] > max) {
+//             max = minterms[i];
+//         }
+//     }
+//     int num_of_bits = 0;
+//     while (max > 0) {
+//         max = max / 2;
+//         num_of_bits++;
+//     }
+//     return num_of_bits;
+// }
 
 //convert minterms from decimal to binary
-vector<string> minterms_to_binary(vector<int> minterms, int v) {
-    vector<string> binary;
-    for (int i = 0; i < minterms.size(); i++) {
-        string temp = "";
-        int num = minterms[i];
-        for (int j = 0; j < v; j++) {
-            temp += to_string(num % 2);
-            num /= 2;
-        }
-        reverse(temp.begin(), temp.end());
-        binary.push_back(temp);
-    }
-    return binary;
-}
+// vector<string> minterms_to_binary(vector<int> minterms, int v) {
+//     vector<string> binary;
+//     for (int i = 0; i < minterms.size(); i++) {
+//         string temp = "";
+//         int num = minterms[i];
+//         for (int j = 0; j < v; j++) {
+//             temp += to_string(num % 2);
+//             num /= 2;
+//         }
+//         reverse(temp.begin(), temp.end());
+//         binary.push_back(temp);
+//     }
+//     return binary;
+// }
+
 template <typename T>
 void print(vector<T> vec) {
     for (auto x : vec) {
@@ -211,6 +212,26 @@ void print(set<string> s) {
     }
     cout << '\n';
 }
+
+void print_prime_implicants(set<string> s, vector<string> variables) {
+    cout << "Prime Implicant Terms: \n";
+    for(auto i: s){
+        string temp = i; 
+        string current = "";
+        for(int j=0; j<i.length(); j++){
+            if(i[j]=='1'){
+                current += variables[j]; 
+            }else if(i[j]=='0'){
+                current += (variables[j]+"\'");
+            }else{
+                continue; 
+            }
+        }
+        cout << current << ",";
+    }
+    cout << endl;
+}
+
 vector<vector<string>> group_minterms(vector<string> minterms)
 {
     vector<vector<string>> minterm_groups;
@@ -291,6 +312,7 @@ void remove_dubplicates(vector<string>& v)
     sort(v.begin(), v.end());
     v.erase(unique(v.begin(), v.end()), v.end());
 }
+
 void compare(vector<vector<string>>& minterms_group, set<set<int>>& implicants, set<string>& implicants_string, set<string>& final_prime_implicants_str,set<set<int>>& final_prime_implicants) {
     vector<string> result;
     set<set<int>> combined;
@@ -360,6 +382,7 @@ void generate_final_prime_implicants(vector<vector<string>>& minterms_group, set
     compare(minterms_group, implicants, implicants_string, final_prime_implicants_str, final_prime_implicants);
     generate_final_prime_implicants(minterms_group, implicants, implicants_string, final_prime_implicants_str, final_prime_implicants);
 }
+
 int main(){
     vector<string> terms; 
     vector<string> variables;
@@ -369,7 +392,7 @@ int main(){
     cin >> expression; 
     isValidExpression(expression,terms,variables);
     printTruthTable(terms,variables,binary_minterms,decimal_minterms);
-        //Youssef
+    //Youssef
     set<set<int>> implicants = vectorToSet(decimal_minterms);
     vector<vector<string>> minterms_group = group_minterms(binary_minterms);
     set<string> implicants_str(binary_minterms.begin(), binary_minterms.end());
@@ -379,6 +402,7 @@ int main(){
     generate_final_prime_implicants(minterms_group, implicants, implicants_str, final_prime_implicants_str, final_prime_implicants);
     cout<<"Prime Implicants represented in binary:\n";
     print(final_prime_implicants_str);
+    print_prime_implicants(final_prime_implicants_str, variables);
     cout<<"Prime Implicants represented by the minterms covered\n";
     print(final_prime_implicants);
     return 0; 
