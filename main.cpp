@@ -218,7 +218,7 @@ vector<vector<string>> group_minterms(vector<string> minterms)
     int minterm_count = minterms.size();
     int minterm_ones_count = 0;
     //loop over possible indices of the List of groups (e.g., index i means Group of i 1s)
-    for (int i = 0; i < minterm_length; i++)
+    for (int i = 0; i <= minterm_length; i++)
     {
         vector<string> minterm_group;
 
