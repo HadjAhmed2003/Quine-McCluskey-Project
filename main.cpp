@@ -382,6 +382,41 @@ void generate_final_prime_implicants(vector<vector<string>>& minterms_group, set
     compare(minterms_group, implicants, implicants_string, final_prime_implicants_str, final_prime_implicants);
     generate_final_prime_implicants(minterms_group, implicants, implicants_string, final_prime_implicants_str, final_prime_implicants);
 }
+void getEssentialPrimeImplicants(const set<set<int>>& sets) {
+    map<int, int> freq;
+    vector<int> essential_numbers;
+    for (const auto& s : sets) {
+        for (const auto& e : s) {
+            freq[e]++;
+        }
+    }
+    for (const auto& it : freq) {
+        if(it.second == 1){
+            essential_numbers.push_back(it.first);
+        }
+    }
+    set<set<int>> result;
+    for (const auto& s : sets) {
+        bool has_essential_element = false;
+        for (const auto& e : essential_numbers) {
+            if (s.count(e) > 0) {
+                has_essential_element = true;
+                break;
+            }
+        }
+        if (has_essential_element) {
+            result.insert(s);
+        }
+    }
+    cout<< "Essential prime implicants : " << endl;
+    for (const auto& s : result) {
+        cout<< "{";
+        for (const auto& e : s) {
+            cout << e << ",";
+        }
+        cout << "}";
+    }
+}
 
 int main(){
     vector<string> terms; 
@@ -405,5 +440,6 @@ int main(){
     print_prime_implicants(final_prime_implicants_str, variables);
     cout<<"Prime Implicants represented by the minterms covered\n";
     print(final_prime_implicants);
+    getEssentialPrimeImplicants(final_prime_implicants);
     return 0; 
 }
