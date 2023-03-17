@@ -27,7 +27,7 @@ bool isValidExpression(string expression, vector<string>& terms, vector<string>&
                 terms.push_back(current_minterm);
             }
         }else if(expression[i]=='+' && expression[i-1]=='\''){
-            if(find(terms.begin(), terms.end(), current_minterm)==terms.end() && i==expression.length()-2){
+            if(find(terms.begin(), terms.end(), current_minterm)==terms.end()){
                 terms.push_back(current_minterm);
             }
             current_minterm = "";
@@ -49,9 +49,9 @@ bool isValidExpression(string expression, vector<string>& terms, vector<string>&
             }
             temp_variable += expression[i+1];
             current_minterm +=temp_variable;
-            // if(find(terms.begin(), terms.end(), current_minterm)==terms.end() && i==expression.length()-2){
-            //     terms.push_back(current_minterm);
-            // }
+            if(find(terms.begin(), terms.end(), current_minterm)==terms.end() && i==expression.length()-2){
+                terms.push_back(current_minterm);
+            }
             i++;
         }else{
             string temp_variable = "";
@@ -297,20 +297,20 @@ set<int> to_decimal_set(string s)
     }
 }
 
-int to_decimal(string binaryString)
-{
-    int decimal = 0;
-    int power = 0;
-    for (int i = binaryString.length() - 1; i >= 0; i--)
-    {
-        if (binaryString[i] == '1')
-        {
-            decimal += pow(2, power);
-        }
-        power++;
-    }
-    return decimal;
-}
+// int to_decimal(string binaryString)
+// {
+//     int decimal = 0;
+//     int power = 0;
+//     for (int i = binaryString.length() - 1; i >= 0; i--)
+//     {
+//         if (binaryString[i] == '1')
+//         {
+//             decimal += pow(2, power);
+//         }
+//         power++;
+//     }
+//     return decimal;
+// }
 
 void remove_dubplicates(vector<string>& v)
 {
@@ -388,6 +388,7 @@ void generate_final_prime_implicants(vector<vector<string>>& minterms_group, set
     compare(minterms_group, implicants, implicants_string, final_prime_implicants_str, final_prime_implicants);
     generate_final_prime_implicants(minterms_group, implicants, implicants_string, final_prime_implicants_str, final_prime_implicants);
 }
+
 string setToString(const set<int>& s) {
     stringstream ss;
     ss << "{";
@@ -397,26 +398,28 @@ string setToString(const set<int>& s) {
     ss << "}";
     return ss.str();
 }
-void print_essential_prime_implicants(set<string> s, vector<string> variables) {
-    cout << "Essential Prime Implicant Terms: \n";
-    for(auto i: s){
-        string temp = i;
-        string current = "";
-        for(int j=0; j<i.length(); j++){
-            if(i[j]=='1'){
-                current += variables[j];
-            }else if(i[j]=='0'){
-                current += (variables[j]+"\'");
-            }else{
-                continue;
-            }
-        }
-        cout << current << ",";
-    }
-    cout << endl;
-}
+
+// void print_essential_prime_implicants(set<string> s, vector<string> variables) {
+//     cout << "Essential Prime Implicant Terms: \n";
+//     for(auto i: s){
+//         string temp = i;
+//         string current = "";
+//         for(int j=0; j<i.length(); j++){
+//             if(i[j]=='1'){
+//                 current += variables[j];
+//             }else if(i[j]=='0'){
+//                 current += (variables[j]+"\'");
+//             }else{
+//                 continue;
+//             }
+//         }
+//         cout << current << ",";
+//     }
+//     cout << endl;
+// }
+
 void getEssentialPrimeImplicants(const set<set<int>>& sets, set<string> PI_str,set<set<int>>& essential_primes, vector<string> variables) {
-     map<int, int> freq;
+    map<int, int> freq;
     vector<int> essential_numbers;
     vector<string> vector(PI_str.begin(), PI_str.end());
     for (const auto& s : sets) {
@@ -461,8 +464,9 @@ void getEssentialPrimeImplicants(const set<set<int>>& sets, set<string> PI_str,s
     }
     cout << endl;
     set <string> s(vector.begin(), vector.end());
-    print_essential_prime_implicants(s, variables);
+    print_prime_implicants(s, variables);
 }
+
 void print_minimized_expression(set<set<int>> prime_implicants, set<set<int>> essential_primes){
     for(auto i: essential_primes){
         set<set<int>>::iterator itr;
