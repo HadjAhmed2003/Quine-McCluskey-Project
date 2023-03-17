@@ -1,7 +1,7 @@
 #include<bits/stdc++.h>
 using namespace std;
 bool isValidExpression(string expression, vector<string>& terms, vector<string>& variables){
-    string current_minterm; 
+    string current_minterm;
     for(int i =0; i<expression.length(); i++){
         if(expression[i]!='\'' && expression[i]!='+' && !isalpha(expression[i])){
             return false;
@@ -10,26 +10,26 @@ bool isValidExpression(string expression, vector<string>& terms, vector<string>&
             string temp_variable = "";
             temp_variable += expression[i];
             if(find(variables.begin(), variables.end(), temp_variable)==variables.end()){
-                variables.push_back(temp_variable); 
-            } 
-            current_minterm +=temp_variable; 
+                variables.push_back(temp_variable);
+            }
+            current_minterm +=temp_variable;
             if(find(terms.begin(), terms.end(), current_minterm)==terms.end()){
                 terms.push_back(current_minterm);
-            } 
+            }
         }else if(isalpha(expression[i]) && expression[i+1]=='+'){
             string temp_variable = "";
             temp_variable += expression[i];
             if(find(variables.begin(), variables.end(), temp_variable)==variables.end()){
-                variables.push_back(temp_variable); 
-            } 
-            current_minterm +=temp_variable; 
+                variables.push_back(temp_variable);
+            }
+            current_minterm +=temp_variable;
             if(find(terms.begin(), terms.end(), current_minterm)==terms.end()){
                 terms.push_back(current_minterm);
-            } 
+            }
         }else if(expression[i]=='+' && expression[i-1]=='\''){
-            if(find(terms.begin(), terms.end(), current_minterm)==terms.end()){
+            if(find(terms.begin(), terms.end(), current_minterm)==terms.end() && i==expression.length()-2){
                 terms.push_back(current_minterm);
-            } 
+            }
             current_minterm = "";
         }
         else if(expression[i]=='+' && variables.size()==0){
@@ -39,30 +39,30 @@ bool isValidExpression(string expression, vector<string>& terms, vector<string>&
         }else if(expression[i]=='+' && terms.size()!=0){
             if(find(terms.begin(), terms.end(), current_minterm)==terms.end()){
                 terms.push_back(current_minterm);
-            } 
-            current_minterm = ""; 
+            }
+            current_minterm = "";
         }else if(isalpha(expression[i]) && expression[i+1]=='\''){
             string temp_variable = "";
             temp_variable += expression[i];
             if(find(variables.begin(), variables.end(), temp_variable)==variables.end()){
-                variables.push_back(temp_variable); 
+                variables.push_back(temp_variable);
             }
             temp_variable += expression[i+1];
-            current_minterm +=temp_variable; 
-            if(find(terms.begin(), terms.end(), current_minterm)==terms.end() && i==expression.length()-2){
-                terms.push_back(current_minterm);
-            } 
-            i++;  
+            current_minterm +=temp_variable;
+            // if(find(terms.begin(), terms.end(), current_minterm)==terms.end() && i==expression.length()-2){
+            //     terms.push_back(current_minterm);
+            // }
+            i++;
         }else{
             string temp_variable = "";
             temp_variable += expression[i];
             if(find(variables.begin(), variables.end(), temp_variable)==variables.end()){
-                variables.push_back(temp_variable); 
-            } 
-            current_minterm +=temp_variable; 
+                variables.push_back(temp_variable);
+            }
+            current_minterm +=temp_variable;
         }
     }
-    return true; 
+    return true;
 }
 
 void printTruthTable(const vector<string>& terms, vector<string> variables,vector<string>& binary_minterms, vector<int>& decimal_minterms) {
@@ -77,8 +77,8 @@ void printTruthTable(const vector<string>& terms, vector<string> variables,vecto
         cout << "-\t";
     }
     cout << "------\n";
-    string PoS = ""; 
-    string SoP = ""; 
+    string PoS = "";
+    string SoP = "";
     for (int i = 0; i < numRows; i++) {
         vector<bool> inputs;
         string temp_binary_minterm = "";
@@ -89,9 +89,9 @@ void printTruthTable(const vector<string>& terms, vector<string> variables,vecto
         for(int j=0; j<n; j++){
             cout << inputs[j] << "\t";
             if(inputs[j]){
-                temp_binary_minterm += "1"; 
+                temp_binary_minterm += "1";
             }else{
-                temp_binary_minterm += "0"; 
+                temp_binary_minterm += "0";
             }
         }
         bool output = false;
@@ -104,7 +104,7 @@ void printTruthTable(const vector<string>& terms, vector<string> variables,vecto
                         value &= inputs[k];
                     } else if (terms[j][z] == (variables[k][0]) && terms[j][z+1]=='\'') {
                         value &= !inputs[k];
-                        z++; 
+                        z++;
                     }
                 }
             }
@@ -134,7 +134,7 @@ void printTruthTable(const vector<string>& terms, vector<string> variables,vecto
     SoP[SoP.length()-1]=' ';
     cout << "\n\n";
     cout << "Canonical SoP: " << SoP << endl;
-    cout << "Canonical PoS: " << PoS << endl;  
+    cout << "Canonical PoS: " << PoS << endl;
 }
 //Youssef
 set<int> makeSet(int num) {
@@ -221,15 +221,15 @@ void print(set<string> s) {
 void print_prime_implicants(set<string> s, vector<string> variables) {
     cout << "Prime Implicant Terms: \n";
     for(auto i: s){
-        string temp = i; 
+        string temp = i;
         string current = "";
         for(int j=0; j<i.length(); j++){
             if(i[j]=='1'){
-                current += variables[j]; 
+                current += variables[j];
             }else if(i[j]=='0'){
                 current += (variables[j]+"\'");
             }else{
-                continue; 
+                continue;
             }
         }
         cout << current << ",";
@@ -388,10 +388,37 @@ void generate_final_prime_implicants(vector<vector<string>>& minterms_group, set
     compare(minterms_group, implicants, implicants_string, final_prime_implicants_str, final_prime_implicants);
     generate_final_prime_implicants(minterms_group, implicants, implicants_string, final_prime_implicants_str, final_prime_implicants);
 }
-
-void getEssentialPrimeImplicants(const set<set<int>>& sets, set<set<int>>& essential_primes) {
-    map<int, int> freq;
+string setToString(const set<int>& s) {
+    stringstream ss;
+    ss << "{";
+    for (const auto& e : s) {
+        ss << e << ",";
+    }
+    ss << "}";
+    return ss.str();
+}
+void print_essential_prime_implicants(set<string> s, vector<string> variables) {
+    cout << "Essential Prime Implicant Terms: \n";
+    for(auto i: s){
+        string temp = i;
+        string current = "";
+        for(int j=0; j<i.length(); j++){
+            if(i[j]=='1'){
+                current += variables[j];
+            }else if(i[j]=='0'){
+                current += (variables[j]+"\'");
+            }else{
+                continue;
+            }
+        }
+        cout << current << ",";
+    }
+    cout << endl;
+}
+void getEssentialPrimeImplicants(const set<set<int>>& sets, set<string> PI_str,set<set<int>>& essential_primes, vector<string> variables) {
+     map<int, int> freq;
     vector<int> essential_numbers;
+    vector<string> vector(PI_str.begin(), PI_str.end());
     for (const auto& s : sets) {
         for (const auto& e : s) {
             freq[e]++;
@@ -413,6 +440,11 @@ void getEssentialPrimeImplicants(const set<set<int>>& sets, set<set<int>>& essen
         if (has_essential_element) {
             essential_primes.insert(s);
         }
+        else {
+            int position = distance(PI_str.begin(), PI_str.find(setToString(s)));
+            auto itVector = vector.begin() + position;
+            vector.erase(itVector);
+        }
     }
     cout<< "Essential prime implicants : " << endl;
     for (const auto& s : essential_primes) {
@@ -422,31 +454,41 @@ void getEssentialPrimeImplicants(const set<set<int>>& sets, set<set<int>>& essen
         }
         cout << "}";
     }
+    cout << endl;
+    cout<< "Essential prime implicants as a Binary representation : " << endl;
+    for(auto it: vector){
+        cout << it << " ,";
+    }
+    cout << endl;
+    set <string> s(vector.begin(), vector.end());
+    print_essential_prime_implicants(s, variables);
 }
-
 void print_minimized_expression(set<set<int>> prime_implicants, set<set<int>> essential_primes){
     for(auto i: essential_primes){
         set<set<int>>::iterator itr;
         for(auto it = prime_implicants.begin(); it!=prime_implicants.end(); it++){
             if(i == *it){
-                itr = it; 
+                itr = it;
             }
         }
-        prime_implicants.erase(itr); 
+        prime_implicants.erase(itr);
+    }
+    for (const auto& s : prime_implicants) {
+        cout<< "{";
+        for (const auto& e : s) {
+            cout << e << ",";
+        }
+        cout << "}";
     }
 }
-
 int main(){
-    vector<string> terms; 
+    vector<string> terms;
     vector<string> variables;
     vector<string> binary_minterms;
     vector<int> decimal_minterms;
-    string expression; 
-    cin >> expression; 
+    string expression;
+    cin >> expression;
     isValidExpression(expression,terms,variables);
-    for(auto i: terms){
-        cout << i << endl; 
-    }
     printTruthTable(terms,variables,binary_minterms,decimal_minterms);
     //Youssef
 
@@ -464,9 +506,10 @@ int main(){
     cout<<"Prime Implicants represented by the minterms covered\n";
     print(final_prime_implicants);
     set<set<int>> essential_primes;
-    getEssentialPrimeImplicants(final_prime_implicants, essential_primes);
+    getEssentialPrimeImplicants(final_prime_implicants, final_prime_implicants_str, essential_primes, variables);
     print_minimized_expression(final_prime_implicants, essential_primes);
-    return 0; 
+    return 0;
 }
+
 
 // , set<string> binary_implicants, set<string> binary_essentials, vector<int> decimal_minterms
