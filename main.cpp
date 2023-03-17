@@ -382,8 +382,9 @@ void compare(vector<vector<string>>& minterms_group, set<set<int>>& implicants, 
 }
 
 void generate_final_prime_implicants(vector<vector<string>>& minterms_group, set<set<int>>& implicants, set<string>& implicants_string, set<string>& final_prime_implicants_str, set<set<int>>& final_prime_implicants) {
-    if (implicants.size() <= 1)
+    if (implicants.size() < 1){
         return;
+    }
     compare(minterms_group, implicants, implicants_string, final_prime_implicants_str, final_prime_implicants);
     generate_final_prime_implicants(minterms_group, implicants, implicants_string, final_prime_implicants_str, final_prime_implicants);
 }
@@ -449,9 +450,12 @@ int main(){
     isValidExpression(expression,terms,variables);
     printTruthTable(terms,variables,binary_minterms,decimal_minterms);
     //Youssef
+
     set<set<int>> implicants = vectorToSet(decimal_minterms);
     vector<vector<string>> minterms_group = group_minterms(binary_minterms);
+
     set<string> implicants_str(binary_minterms.begin(), binary_minterms.end());
+
     set<set<int>> final_prime_implicants;
     set<string> final_prime_implicants_str;
     generate_final_prime_implicants(minterms_group, implicants, implicants_str, final_prime_implicants_str, final_prime_implicants);
