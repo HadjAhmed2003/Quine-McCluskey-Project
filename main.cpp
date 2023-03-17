@@ -27,7 +27,7 @@ bool isValidExpression(string expression, vector<string>& terms, vector<string>&
                 terms.push_back(current_minterm);
             } 
         }else if(expression[i]=='+' && expression[i-1]=='\''){
-            if(find(terms.begin(), terms.end(), current_minterm)==terms.end() && i==expression.length()-2){
+            if(find(terms.begin(), terms.end(), current_minterm)==terms.end()){
                 terms.push_back(current_minterm);
             } 
             current_minterm = "";
@@ -49,9 +49,9 @@ bool isValidExpression(string expression, vector<string>& terms, vector<string>&
             }
             temp_variable += expression[i+1];
             current_minterm +=temp_variable; 
-            // if(find(terms.begin(), terms.end(), current_minterm)==terms.end() && i==expression.length()-2){
-            //     terms.push_back(current_minterm);
-            // } 
+            if(find(terms.begin(), terms.end(), current_minterm)==terms.end() && i==expression.length()-2){
+                terms.push_back(current_minterm);
+            } 
             i++;  
         }else{
             string temp_variable = "";
@@ -387,6 +387,7 @@ void generate_final_prime_implicants(vector<vector<string>>& minterms_group, set
     compare(minterms_group, implicants, implicants_string, final_prime_implicants_str, final_prime_implicants);
     generate_final_prime_implicants(minterms_group, implicants, implicants_string, final_prime_implicants_str, final_prime_implicants);
 }
+
 void getEssentialPrimeImplicants(const set<set<int>>& sets, set<set<int>>& essential_primes) {
     map<int, int> freq;
     vector<int> essential_numbers;
@@ -421,6 +422,7 @@ void getEssentialPrimeImplicants(const set<set<int>>& sets, set<set<int>>& essen
         cout << "}";
     }
 }
+
 void print_minimized_expression(set<set<int>> prime_implicants, set<set<int>> essential_primes){
     for(auto i: essential_primes){
         set<set<int>>::iterator itr;
@@ -431,14 +433,8 @@ void print_minimized_expression(set<set<int>> prime_implicants, set<set<int>> es
         }
         prime_implicants.erase(itr); 
     }
-    for (const auto& s : prime_implicants) {
-        cout<< "{";
-        for (const auto& e : s) {
-            cout << e << ",";
-        }
-        cout << "}";
-    }
 }
+
 int main(){
     vector<string> terms; 
     vector<string> variables;
@@ -447,6 +443,9 @@ int main(){
     string expression; 
     cin >> expression; 
     isValidExpression(expression,terms,variables);
+    for(auto i: terms){
+        cout << i << endl; 
+    }
     printTruthTable(terms,variables,binary_minterms,decimal_minterms);
     //Youssef
     set<set<int>> implicants = vectorToSet(decimal_minterms);
@@ -465,6 +464,5 @@ int main(){
     print_minimized_expression(final_prime_implicants, essential_primes);
     return 0; 
 }
-
 
 // , set<string> binary_implicants, set<string> binary_essentials, vector<int> decimal_minterms
