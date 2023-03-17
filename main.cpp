@@ -382,7 +382,7 @@ void generate_final_prime_implicants(vector<vector<string>>& minterms_group, set
     compare(minterms_group, implicants, implicants_string, final_prime_implicants_str, final_prime_implicants);
     generate_final_prime_implicants(minterms_group, implicants, implicants_string, final_prime_implicants_str, final_prime_implicants);
 }
-void getEssentialPrimeImplicants(const set<set<int>>& sets) {
+void getEssentialPrimeImplicants(const set<set<int>>& sets, set<set<int>>& essential_primes) {
     map<int, int> freq;
     vector<int> essential_numbers;
     for (const auto& s : sets) {
@@ -395,7 +395,6 @@ void getEssentialPrimeImplicants(const set<set<int>>& sets) {
             essential_numbers.push_back(it.first);
         }
     }
-    set<set<int>> result;
     for (const auto& s : sets) {
         bool has_essential_element = false;
         for (const auto& e : essential_numbers) {
@@ -405,11 +404,11 @@ void getEssentialPrimeImplicants(const set<set<int>>& sets) {
             }
         }
         if (has_essential_element) {
-            result.insert(s);
+            essential_primes.insert(s);
         }
     }
     cout<< "Essential prime implicants : " << endl;
-    for (const auto& s : result) {
+    for (const auto& s : essential_primes) {
         cout<< "{";
         for (const auto& e : s) {
             cout << e << ",";
@@ -417,7 +416,6 @@ void getEssentialPrimeImplicants(const set<set<int>>& sets) {
         cout << "}";
     }
 }
-
 int main(){
     vector<string> terms; 
     vector<string> variables;
@@ -433,13 +431,14 @@ int main(){
     set<string> implicants_str(binary_minterms.begin(), binary_minterms.end());
     set<set<int>> final_prime_implicants;
     set<string> final_prime_implicants_str;
-
     generate_final_prime_implicants(minterms_group, implicants, implicants_str, final_prime_implicants_str, final_prime_implicants);
     cout<<"Prime Implicants represented in binary:\n";
     print(final_prime_implicants_str);
     print_prime_implicants(final_prime_implicants_str, variables);
     cout<<"Prime Implicants represented by the minterms covered\n";
     print(final_prime_implicants);
-    getEssentialPrimeImplicants(final_prime_implicants);
+    set<set<int>> essential_primes;
+    getEssentialPrimeImplicants(final_prime_implicants, essential_primes);
+    
     return 0; 
 }
