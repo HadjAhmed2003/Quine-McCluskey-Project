@@ -26,8 +26,13 @@ bool isValidExpression(string expression, vector<string>& terms, vector<string>&
             if(find(terms.begin(), terms.end(), current_minterm)==terms.end()){
                 terms.push_back(current_minterm);
             } 
+        }else if(expression[i]=='+' && expression[i-1]=='\''){
+            if(find(terms.begin(), terms.end(), current_minterm)==terms.end() && i==expression.length()-2){
+                terms.push_back(current_minterm);
+            } 
+            current_minterm = "";
         }
-        else if(expression[i]=='+' && terms.size()==0){
+        else if(expression[i]=='+' && variables.size()==0){
             return false;
         }else if(expression[i] == '\'' && (i == 0||!isalpha(expression[i-1]))){
             return false;
@@ -44,9 +49,9 @@ bool isValidExpression(string expression, vector<string>& terms, vector<string>&
             }
             temp_variable += expression[i+1];
             current_minterm +=temp_variable; 
-            if(find(terms.begin(), terms.end(), current_minterm)==terms.end() && i==expression.length()-2){
-                terms.push_back(current_minterm);
-            } 
+            // if(find(terms.begin(), terms.end(), current_minterm)==terms.end() && i==expression.length()-2){
+            //     terms.push_back(current_minterm);
+            // } 
             i++;  
         }else{
             string temp_variable = "";
@@ -416,6 +421,24 @@ void getEssentialPrimeImplicants(const set<set<int>>& sets, set<set<int>>& essen
         cout << "}";
     }
 }
+void print_minimized_expression(set<set<int>> prime_implicants, set<set<int>> essential_primes){
+    for(auto i: essential_primes){
+        set<set<int>>::iterator itr;
+        for(auto it = prime_implicants.begin(); it!=prime_implicants.end(); it++){
+            if(i == *it){
+                itr = it; 
+            }
+        }
+        prime_implicants.erase(itr); 
+    }
+    for (const auto& s : prime_implicants) {
+        cout<< "{";
+        for (const auto& e : s) {
+            cout << e << ",";
+        }
+        cout << "}";
+    }
+}
 int main(){
     vector<string> terms; 
     vector<string> variables;
@@ -439,6 +462,9 @@ int main(){
     print(final_prime_implicants);
     set<set<int>> essential_primes;
     getEssentialPrimeImplicants(final_prime_implicants, essential_primes);
-    
+    print_minimized_expression(final_prime_implicants, essential_primes);
     return 0; 
 }
+
+
+// , set<string> binary_implicants, set<string> binary_essentials, vector<int> decimal_minterms
