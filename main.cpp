@@ -467,7 +467,41 @@ void getEssentialPrimeImplicants(const set<set<int>>& sets, set<string> PI_str,s
     print_prime_implicants(s, variables);
 }
 
-void print_minimized_expression(set<set<int>> prime_implicants, set<set<int>> essential_primes){
+void get_next_term(set<set<int>> prime_implicants,vector<int> decimal_minterms, set<int>& covered_minterms,set<set<int>>& result_sets){
+    if(decimal_minterms.size()==covered_minterms.size()){
+        return; 
+    }
+    vector<int> count_uncovered;
+    for(auto i:prime_implicants){
+        int count = 0; 
+        for(auto j:i){
+            if(find(covered_minterms.begin(), covered_minterms.end(), j)==covered_minterms.end()){
+                count++; 
+            }
+        }
+        count_uncovered.push_back(count);
+    }
+    int max_index = 0;
+    int max_count = 0;  
+    for(int i=0;i<count_uncovered.size(); i++){
+        if(count_uncovered[i]>max_count){
+            max_count = count_uncovered[i]; 
+            max_index = i; 
+        }
+    }
+    count_uncovered.erase(count_uncovered.begin()+max_index);
+    auto it = prime_implicants.begin();
+    advance(it,max_index);
+    for(auto i:*it){
+        covered_minterms.insert(i);
+    } 
+    result_sets.insert(*it);
+    prime_implicants.erase(it);
+    return get_next_term(prime_implicants, decimal_minterms,covered_minterms,result_sets); 
+}
+
+
+void print_minimized_expression(set<set<int>> prime_implicants, set<set<int>> essential_primes, vector<int> decimal_minterms){ 
     for(auto i: essential_primes){
         set<set<int>>::iterator itr;
         for(auto it = prime_implicants.begin(); it!=prime_implicants.end(); it++){
@@ -477,13 +511,23 @@ void print_minimized_expression(set<set<int>> prime_implicants, set<set<int>> es
         }
         prime_implicants.erase(itr);
     }
-    for (const auto& s : prime_implicants) {
-        cout<< "{";
+    vector<int> count_uncovered(prime_implicants.size());
+    set<set<int>> result_sets; 
+    set<int> covered_minterms; 
+    for (const auto& s : essential_primes) {
+        result_sets.insert(s); 
         for (const auto& e : s) {
-            cout << e << ",";
+            covered_minterms.insert(e); 
         }
-        cout << "}";
-    }
+    } 
+    get_next_term(prime_implicants, decimal_minterms,covered_minterms,result_sets);
+    // for (const auto& s : result_sets) {
+    //     cout<< "{";
+    //     for (const auto& e : s) {
+    //         cout << e << ",";
+    //     }
+    //     cout << "}";
+    // }
 }
 int main(){
     vector<string> terms;
@@ -511,9 +555,9 @@ int main(){
     print(final_prime_implicants);
     set<set<int>> essential_primes;
     getEssentialPrimeImplicants(final_prime_implicants, final_prime_implicants_str, essential_primes, variables);
-    print_minimized_expression(final_prime_implicants, essential_primes);
+    print_minimized_expression(final_prime_implicants, essential_primes,decimal_minterms);
     return 0;
 }
 
 
-// , set<string> binary_implicants, set<string> binary_essentials, vector<int> decimal_minterms
+
