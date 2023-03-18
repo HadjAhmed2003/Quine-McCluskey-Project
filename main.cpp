@@ -421,9 +421,11 @@ void getEssentialPrimeImplicants(const set<set<int>>& sets, set<string> PI_str,s
     map<int, int> freq;
     vector<int> essential_numbers;
     vector<string> vector(PI_str.begin(), PI_str.end());
+    set<int> uncovered_minterms;
     for (const auto& s : sets) {
         for (const auto& e : s) {
             freq[e]++;
+            uncovered_minterms.insert(e);
         }
     }
     for (const auto& it : freq) {
@@ -441,6 +443,9 @@ void getEssentialPrimeImplicants(const set<set<int>>& sets, set<string> PI_str,s
         }
         if (has_essential_element) {
             essential_primes.insert(s);
+            for (const auto& e : s) {
+                uncovered_minterms.erase(e);
+            }
         }
         else {
             int position = distance(PI_str.begin(), PI_str.find(setToString(s)));
@@ -465,6 +470,12 @@ void getEssentialPrimeImplicants(const set<set<int>>& sets, set<string> PI_str,s
     set <string> s(vector.begin(), vector.end());
     cout << "Essential Prime Implicants as Terms : " << endl;
     print_prime_implicants(s, variables);
+
+    cout << "Uncovered Minterms: ";
+    for (const auto& e : uncovered_minterms) {
+        cout << e << " ";
+    }
+    cout << endl;
 }
 
 void get_next_term(set<set<int>> prime_implicants,vector<int> decimal_minterms, set<int>& covered_minterms,set<set<int>>& result_sets){
