@@ -149,38 +149,6 @@ set<set<int>> vectorToSet(vector<int>& vec) {
     return result;
 }
 
-//detect the number of variables in boolean function
-// int num_of_variables(vector<int> minterms) {
-//     int max = 0;
-//     for (int i = 0; i < minterms.size(); i++) {
-//         if (minterms[i] > max) {
-//             max = minterms[i];
-//         }
-//     }
-//     int num_of_bits = 0;
-//     while (max > 0) {
-//         max = max / 2;
-//         num_of_bits++;
-//     }
-//     return num_of_bits;
-// }
-
-//convert minterms from decimal to binary
-// vector<string> minterms_to_binary(vector<int> minterms, int v) {
-//     vector<string> binary;
-//     for (int i = 0; i < minterms.size(); i++) {
-//         string temp = "";
-//         int num = minterms[i];
-//         for (int j = 0; j < v; j++) {
-//             temp += to_string(num % 2);
-//             num /= 2;
-//         }
-//         reverse(temp.begin(), temp.end());
-//         binary.push_back(temp);
-//     }
-//     return binary;
-// }
-
 template <typename T>
 void print(vector<T> vec) {
     for (auto x : vec) {
@@ -231,7 +199,7 @@ void print_prime_implicants(set<string> s, vector<string> variables) {
                 continue;
             }
         }
-        cout << current << ",";
+        cout << current << "+";
     }
     cout << endl;
 }
@@ -296,21 +264,6 @@ set<int> to_decimal_set(string s)
     }
 }
 
-// int to_decimal(string binaryString)
-// {
-//     int decimal = 0;
-//     int power = 0;
-//     for (int i = binaryString.length() - 1; i >= 0; i--)
-//     {
-//         if (binaryString[i] == '1')
-//         {
-//             decimal += pow(2, power);
-//         }
-//         power++;
-//     }
-//     return decimal;
-// }
-
 void remove_dubplicates(vector<string>& v)
 {
     sort(v.begin(), v.end());
@@ -373,7 +326,6 @@ void compare(vector<vector<string>>& minterms_group, set<set<int>>& implicants, 
         }
         return;
     }
-        
     remove_dubplicates(result);
     minterms_group = group_minterms(result);
 
@@ -388,6 +340,31 @@ void generate_final_prime_implicants(vector<vector<string>>& minterms_group, set
     generate_final_prime_implicants(minterms_group, implicants, implicants_string, final_prime_implicants_str, final_prime_implicants);
 }
 
+std::string convertToBinary(int n, int numVars)
+{
+    std::string binaryStr = std::bitset<32>(n).to_string();
+    binaryStr = binaryStr.substr(binaryStr.length() - numVars, numVars);
+    return binaryStr;
+}
+std::string generateImplicant(set<int> implicant, int numVars)
+{
+    
+    vector<string> binary_mint;
+    for(auto i: implicant){
+        binary_mint.push_back(convertToBinary(i, numVars));
+    }
+    std::string implicantStr = binary_mint[0];
+    for (int i = 0; i < implicantStr.length(); i++){
+        for(int j=1; j<implicant.size(); j++){
+            if(binary_mint[j][i]!=implicantStr[i]){
+                implicantStr[i]='-';
+            }
+        }
+    }
+    return implicantStr;
+}
+
+
 string setToString(const set<int>& s) {
     stringstream ss;
     ss << "{";
@@ -397,25 +374,6 @@ string setToString(const set<int>& s) {
     ss << "}";
     return ss.str();
 }
-
-// void print_essential_prime_implicants(set<string> s, vector<string> variables) {
-//     cout << "Essential Prime Implicant Terms: \n";
-//     for(auto i: s){
-//         string temp = i;
-//         string current = "";
-//         for(int j=0; j<i.length(); j++){
-//             if(i[j]=='1'){
-//                 current += variables[j];
-//             }else if(i[j]=='0'){
-//                 current += (variables[j]+"\'");
-//             }else{
-//                 continue;
-//             }
-//         }
-//         cout << current << ",";
-//     }
-//     cout << endl;
-// }
 
 void getEssentialPrimeImplicants(const set<set<int>>& sets, set<string> PI_str,set<set<int>>& essential_primes, vector<string> variables) {
     map<int, int> freq;
@@ -462,14 +420,9 @@ void getEssentialPrimeImplicants(const set<set<int>>& sets, set<string> PI_str,s
         cout << "}";
     }
     cout << endl;
-    cout<< "Essential prime implicants as a Binary representation : " << endl;
-    for(auto it: vector){
-        cout << it << " ,";
-    }
-    cout << endl;
-    set <string> s(vector.begin(), vector.end());
-    cout << "Essential Prime Implicants as Terms : " << endl;
-    print_prime_implicants(s, variables);
+    // set <string> s(vector.begin(), vector.end());
+    // cout << "Essential Prime Implicants as Terms : " << endl;
+    // print_prime_implicants(s, variables);
 
     cout << "Uncovered Minterms: ";
     for (const auto& e : uncovered_minterms) {
@@ -544,25 +497,31 @@ void print_minimized_expression(set<set<int>> prime_implicants, set<set<int>> es
         cout << "}";
     }
     cout <<endl;
-    
-    for (auto& it1 : p2 ) {
-        bool foundMatch = false;
-        for (auto& set2 : result_sets) {
-            if (it1 == set2) {
-                foundMatch = true;
-                break;
-            }
-        }
-        if (!foundMatch) {
-            int position = distance(PI_str.begin(), PI_str.find(setToString(it1)));
-            auto itVector = vector.begin() + position;
-            vector.erase(itVector);
-        }
+    set<string> binary;
+    cout<< "Final implicants as a Binary representation : " << endl;
+    for(auto i : result_sets){
+            string temp = generateImplicant(i, variables.size());
+            cout << temp <<",";
+            binary.insert(temp);
     }
+    // for (auto& it1 : p2 ) {
+    //     bool foundMatch = false;
+    //     for (auto& set2 : result_sets) {
+    //         if (it1 == set2) {
+    //             foundMatch = true;
+    //             break;
+    //         }
+    //     }
+    //     if (!foundMatch) {
+    //         int position = distance(PI_str.begin(), PI_str.find(setToString(it1)));
+    //         auto itVector = vector.begin() + position;
+    //         vector.erase(itVector);
+    //     }
+    // }
     cout <<endl;
-    set <string> s(vector.begin(), vector.end());
+    // set <string> s(vector.begin(), vector.end());
     cout<< " Minimization represented in Terms : " <<endl;
-    print_prime_implicants(s, variables);
+    print_prime_implicants(binary, variables);
 }
 int main(){
     vector<string> terms;
@@ -571,28 +530,39 @@ int main(){
     vector<int> decimal_minterms;
     string expression;
     cin >> expression;
-    isValidExpression(expression,terms,variables);
-    printTruthTable(terms,variables,binary_minterms,decimal_minterms);
-    //Youssef
+    if(isValidExpression(expression,terms,variables)){
+        printTruthTable(terms,variables,binary_minterms,decimal_minterms);
+        set<set<int>> implicants = vectorToSet(decimal_minterms);
+        vector<vector<string>> minterms_group = group_minterms(binary_minterms);
+        set<string> implicants_str(binary_minterms.begin(), binary_minterms.end());
+        set<set<int>> final_prime_implicants;
+        set<string> final_prime_implicants_str;
+        generate_final_prime_implicants(minterms_group, implicants, implicants_str, final_prime_implicants_str, final_prime_implicants);
+        cout<<"Prime Implicants represented in binary:\n";
+        print(final_prime_implicants_str);
+        cout <<"Prime Implicants represented in Terms : " <<endl;
+        print_prime_implicants(final_prime_implicants_str, variables);
+        cout<<"Prime Implicants represented by the minterms covered\n";
+        print(final_prime_implicants);
+        set<set<int>> essential_primes;
+        getEssentialPrimeImplicants(final_prime_implicants, final_prime_implicants_str, essential_primes, variables);
+        set<string> binary_essentials;
+        cout << endl;
+        cout<< "Essential prime implicants as a Binary representation : " << endl;
+        for(auto i : essential_primes){
+            string temp = generateImplicant(i, variables.size());
+            cout << temp <<",";
+            binary_essentials.insert(temp);
+        }
+        cout << endl;
+        cout << "Essential prime implicants as Terms :" <<endl;
+        print_prime_implicants(binary_essentials, variables);
+        cout<<endl;
+        print_minimized_expression(final_prime_implicants, essential_primes,decimal_minterms,final_prime_implicants_str, variables);
 
-    set<set<int>> implicants = vectorToSet(decimal_minterms);
-    vector<vector<string>> minterms_group = group_minterms(binary_minterms);
-
-    set<string> implicants_str(binary_minterms.begin(), binary_minterms.end());
-
-    set<set<int>> final_prime_implicants;
-    set<string> final_prime_implicants_str;
-    generate_final_prime_implicants(minterms_group, implicants, implicants_str, final_prime_implicants_str, final_prime_implicants);
-    cout<<"Prime Implicants represented in binary:\n";
-    print(final_prime_implicants_str);
-    cout <<"Prime Implicants represented in Terms : " <<endl;
-    print_prime_implicants(final_prime_implicants_str, variables);
-    cout<<"Prime Implicants represented by the minterms covered\n";
-    print(final_prime_implicants);
-    set<set<int>> essential_primes;
-    getEssentialPrimeImplicants(final_prime_implicants, final_prime_implicants_str, essential_primes, variables);
-    print_minimized_expression(final_prime_implicants, essential_primes,decimal_minterms,final_prime_implicants_str, variables);
-    
+    }else{
+        cout << "Invalid Boolean Expression";
+    }
     return 0;
 }
 
